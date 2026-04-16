@@ -1,30 +1,18 @@
-# DROP OS — Product Requirements Document
+# DROP OS — PRD
 
-## Original Problem Statement
-Build DROP OS: a single-user, AI-only operating system where the AI core replaces the traditional shell/desktop as the primary interface. Bootable ISO for bare metal (Thermaltake tower).
+## Problem Statement
+Build DROP OS: single-user, AI-only OS. No login, no GUI, no multi-user. AI core is the only interface. Bootable ISO for Thermaltake tower. Ollama (llama3) local LLM.
 
-## Architecture
-- Custom init (PID 1) → launches 5 background daemons + AI core in foreground
-- AI Core: Ollama LLM (llama3) via HTTP, parses THOUGHT/CMD format
-- Memory: File-based vector store (pluggable to ChromaDB)
-- Audio: Always-on mic capture via sounddevice (Whisper STT ready)
-- Execution: Docker-isolated Python code runner
-- WebIntel: DuckDuckGo research → memory ingestion
-- HITL: Diff-based patch approval gate
+## What's Implemented (2026-04-16)
+- Complete source tree: ai_core, audio, memory, exec_engine, webintel, hitl — 1:1 with 3-block spec
+- call_llm() wired to Ollama HTTP localhost:11434
+- All shell launchers (bin/) with correct permissions
+- Automated build-iso.sh: one-command ISO builder (debootstrap→chroot→Ollama→GRUB→ISO)
+- Downloadable tarball: drop-os-complete.tar.gz
+- ISO cannot be built in this ARM64 container — script runs on user's x86_64 machine
 
-## What's Been Implemented (2026-04-16)
-- Complete source tree at /app/drop-os/ matching 3-block spec
-- All 7 shell launchers (bin/)
-- All 6 Python modules (ai_core, audio, memory, exec_engine, webintel, hitl)
-- call_llm() wired to Ollama HTTP API
-- VectorStore, ExecutionEngine, Orchestrator tested and passing
-- README with full ISO build instructions
-
-## User Personas
-- Single power user on dedicated hardware (Thermaltake tower)
-
-## Prioritized Backlog
-- P0: [DONE] Source tree implementation
-- P1: ISO build automation script
-- P2: Real Whisper STT integration in audio daemon
-- P2: ChromaDB upgrade path for vector store
+## Backlog
+- P1: User runs build-iso.sh on x86_64 machine → gets drop-os.iso
+- P2: Wire Whisper STT into audio daemon
+- P2: ChromaDB upgrade for vector store
+- P3: Network auto-config in init-drop (dhclient/dhcpcd)
