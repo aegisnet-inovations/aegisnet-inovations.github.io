@@ -8,9 +8,24 @@ mount -t devtmpfs dev /dev
 # Bring up loopback
 ip link set lo up
 
-# OPTIONAL: bring up main NIC (adjust name)
-# ip link set eth0 up
-# dhclient eth0
+# Auto-detect and bring up first available ethernet NIC
+NIC=$(ip -o link show | awk -F': ' '{print $2}' | grep -v lo | head -1)
+if [ -n "$NIC" ]; then
+    echo "DROP init: bringing up $NIC..."
+    ip link set "$NIC" up
+    # Try dhcpcd first, fall back to dhclient
+    if command -v dhcpcd >/dev/null 2>&1; then
+        dhcpcd "$NIC" &
+    elif command -v dhclient >/dev/null 2>&1; then
+        dhclient "$NIC" &
+    fi
+    sleep 3
+    echo "DROP init: network up on $NIC"
+fi
+
+# Start Ollama LLM server
+/usr/local/bin/ollama serve &
+sleep 3
 
 # Start DROP subsystems in background
 /opt/drop-os/bin/drop-audio &

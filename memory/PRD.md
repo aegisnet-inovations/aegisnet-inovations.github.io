@@ -1,24 +1,18 @@
 # DROP OS — PRD
 
 ## Problem Statement
-Build DROP OS: single-user, AI-only OS. No login, no GUI, no multi-user. AI core is the only interface. Bootable ISO for Thermaltake tower (AMD chipset, Gigabyte mobo, DDR3, AMD/ATI GPU — CPU-only compute). Ollama (llama3) local LLM.
+Build DROP OS: single-user, AI-only OS for Thermaltake tower (AMD chipset, Gigabyte mobo, DDR3, AMD/ATI GPU — CPU-only). Ollama llama3 local LLM. Bootable ISO.
 
 ## What's Implemented (2026-04-16)
-- Complete source tree: ai_core, audio, memory, exec_engine, webintel, hitl — 1:1 with 3-block spec
-- call_llm() wired to Ollama HTTP localhost:11434 (llama3)
-- Whisper STT wired into audio/daemon.py (base model, fp16=False for CPU-only)
-- Audio daemon: captures 5s mic chunks → Whisper transcription → .txt files → memory ingestion
-- All shell launchers (bin/) with correct permissions
-- Automated build-iso.sh: one-command ISO builder
+- Complete source tree 1:1 with 3-block spec
+- call_llm() → Ollama HTTP localhost:11434 (llama3)
+- Whisper STT in audio/daemon.py (base model, fp16=False, CPU-only)
+- ChromaDB semantic search in vectordb.py (all-MiniLM-L6-v2 embeddings, cosine similarity, with flat-log fallback)
+- Network auto-detect in init-drop (finds first NIC, dhcpcd/dhclient)
+- Ollama auto-start in init-drop
+- Automated build-iso.sh (one command → drop-os.iso)
 - Downloadable tarball: drop-os-complete.tar.gz
 
-## Hardware Profile (Thermaltake Tower)
-- AMD chipset (vendor 1002), Gigabyte motherboard
-- DDR3 RAM, 4 DIMM slots
-- AMD/ATI GPU (no CUDA — CPU-only inference)
-- Whisper: base model (CPU), Ollama: llama3 8B
-
 ## Backlog
-- P1: User builds ISO on tower via build-iso.sh
-- P2: ChromaDB upgrade for vector store
-- P3: Network auto-config in init-drop
+- P1: User builds ISO on x86_64 machine
+- P3: Tune Ollama model for AMD hardware (llama3 vs phi3:mini)
