@@ -1,0 +1,22 @@
+#!/bin/sh
+# DROP OS single-user init (PID 1)
+
+mount -t proc proc /proc
+mount -t sysfs sys /sys
+mount -t devtmpfs dev /dev
+
+# Bring up loopback
+ip link set lo up
+
+# OPTIONAL: bring up main NIC (adjust name)
+# ip link set eth0 up
+# dhclient eth0
+
+# Start DROP subsystems in background
+/opt/drop-os/bin/drop-audio &
+/opt/drop-os/bin/drop-memory &
+/opt/drop-os/bin/drop-webintel &
+/opt/drop-os/bin/drop-hitl &
+
+# Start AI core in foreground — this *is* the system
+exec /opt/drop-os/bin/drop-core
